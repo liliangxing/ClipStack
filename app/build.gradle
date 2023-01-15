@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '25.0.0'
+
+    defaultConfig {
+        applicationId "com.catchingnow.clip"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionName "2.1.9" //jfhuh
+    }
+    signingConfigs {
+        baseSignConfigs {
+            //MD5: 71:E5:40:32:69:0D:EB:C0:BE:28:5F:8F:9B:59:09:24
+            //SHA1: F5:E8:CF:7B:83:FD:66:53:D4:5D:9B:D8:47:A7:F2:1A:61:00:26:F0
+            //storeFile file('C:/Users/win7/.android/bpa.keystore')
+            storeFile file("bpa.keystore")        // 签名文件的路径
+            storePassword "bpa.com"               // 密码
+            keyAlias "bpa"                        // 签名的别名
+            keyPassword "bpa.com"                 // 密码
+
+            //v1和v2的签名使用
+            //1）只勾选v1签名并不会影响什么，但是在7.0上不会使用更安全的验证方式
+            //2）只勾选V2签名7.0以下会直接安装完显示未安装，7.0以上则使用了V2的方式验证
+            //3）同时勾选V1和V2则所有机型都没问题
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            minifyEnabled false                  // 开启代码混淆
+            shrinkResources false                // 移除无用的resource文件
+            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            signingConfig signingConfigs.baseSignConfigs
+        }
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:recyclerview-v7:21.0.2'
+    compile 'com.android.support:cardview-v7:21.0.2'
+}
