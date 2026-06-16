@@ -8,7 +8,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.graphics.PixelFormat;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -59,18 +59,20 @@ public class FloatingWindowService extends Service {
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
         params.x = preference.getInt(FLOATING_WINDOW_X, 300);
         params.y = preference.getInt(FLOATING_WINDOW_Y, 0);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            params.width = getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material) + MyUtil.dip2px(this, 4);
-            params.height = getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material) + MyUtil.dip2px(this, 8);
+            int actionBarSize = MyUtil.dip2px(this, 56);
+            params.width = actionBarSize + MyUtil.dip2px(this, 4);
+            params.height = actionBarSize + MyUtil.dip2px(this, 8);
         } else {
-            params.width = getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material);
-            params.height = getResources().getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material);
+            int actionBarSize = MyUtil.dip2px(this, 56);
+            params.width = actionBarSize;
+            params.height = actionBarSize;
             params.alpha = (float) 0.9;
         }
         windowManager.addView(floatingView, params);

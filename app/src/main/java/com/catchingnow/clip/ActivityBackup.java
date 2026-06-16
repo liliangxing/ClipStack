@@ -183,10 +183,8 @@ public class ActivityBackup extends MyActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch (id) {
-            case R.id.action_refresh:
-                initImportView(true);
-                break;
+        if (id == R.id.action_refresh) {
+            initImportView(true);
         }
         return super.onOptionsItemSelected(item);
     }

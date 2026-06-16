@@ -14,15 +14,17 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.MenuItemCompat;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import android.provider.Settings;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -93,6 +95,17 @@ public class ActivityMain extends MyActionBarActivity {
         queryText = "";
 
         mFAB = (ImageButton) findViewById(R.id.main_fab);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 2);
+                    }
+                }, 1500);
+            }
+        }
         mRecLayout = (LinearLayout) findViewById(R.id.recycler_layout);
         mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         if (getString(R.string.screen_type).contains("phone")) {
@@ -132,13 +145,39 @@ public class ActivityMain extends MyActionBarActivity {
                 new IntentFilter(Storage.UPDATE_DB));
     }
     private void checkPermission(int requestCode) {
-        int permissionCheck = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE},
-                    requestCode);
-        }else {
-            initializeCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!android.os.Environment.isExternalStorageManager()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.app_name)
+                        .setMessage("ClipStack needs storage access to save clipboard database. Please grant 'All files access' permission.")
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                                intent.setData(Uri.parse("package:" + getPackageName()));
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .create()
+                        .show();
+            } else {
+                initializeCreate();
+            }
+        } else {
+            int permissionCheck = checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        requestCode);
+            } else {
+                initializeCreate();
+            }
         }
     }
 
@@ -349,24 +388,17 @@ public class ActivityMain extends MyActionBarActivity {
 
         int id = item.getItemId();
 
-        switch (id) {
-            case R.id.action_search:
-                return super.onOptionsItemSelected(item);
-            case R.id.action_star:
-                onStarredMenuClicked();
-                break;
-//            case R.id.action_refresh:
-//                setView(queryText);
-//                return super.onOptionsItemSelected(item);
-            case R.id.action_export:
-                startActivity(new Intent(context, ActivityBackup.class));
-                break;
-            case R.id.action_delete_all:
-                clearAll();
-                break;
-            case R.id.action_settings:
-                startActivity(new Intent(this, ActivitySetting.class));
-                cancelSecondLaunch();
+        if (id == R.id.action_search) {
+            return super.onOptionsItemSelected(item);
+        } else if (id == R.id.action_star) {
+            onStarredMenuClicked();
+        } else if (id == R.id.action_export) {
+            startActivity(new Intent(context, ActivityBackup.class));
+        } else if (id == R.id.action_delete_all) {
+            clearAll();
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(this, ActivitySetting.class));
+            cancelSecondLaunch();
         }
         clearDeleteQueue();
         return super.onOptionsItemSelected(item);

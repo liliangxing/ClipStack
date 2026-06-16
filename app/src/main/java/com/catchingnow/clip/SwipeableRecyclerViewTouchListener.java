@@ -23,8 +23,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -38,7 +38,7 @@ import java.util.List;
 
 
 /**
- * A {@link View.OnTouchListener} that makes the list items in a {@link android.support.v7.widget.RecyclerView}
+ * A {@link View.OnTouchListener} that makes the list items in a {@link RecyclerView}
  * dismissable by swiping.
  * <p/>
  * <p>Example usage:</p>
@@ -404,6 +404,10 @@ public class SwipeableRecyclerViewTouchListener implements RecyclerView.OnItemTo
      * The callback interface used by {@link SwipeableRecyclerViewTouchListener} to inform its client
      * about a swipe of one or more list item positions.
      */
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+    }
+
     public interface SwipeListener {
         /**
          * Called to determine whether the given position can be swiped.

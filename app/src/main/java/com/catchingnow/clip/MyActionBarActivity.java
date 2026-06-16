@@ -7,11 +7,10 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.internal.widget.TintImageView;
-import android.support.v7.widget.Toolbar;
+import androidx.preference.PreferenceManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,13 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
 /**
  * Created by heruoxin on 15/2/28.
  */
-public class MyActionBarActivity extends ActionBarActivity {
+public class MyActionBarActivity extends AppCompatActivity {
     public static final String ACTIVITY_OPENED = "activity_opened";
     public static final String ACTIVITY_CLOSED = "activity_closed";
 
@@ -195,7 +195,7 @@ public class MyActionBarActivity extends ActionBarActivity {
     }
 
     public static void setOverflowButtonColor(final Activity activity, final int imageID) {
-        final String overflowDescription = activity.getString(R.string.abc_action_menu_overflow_description);
+        final String overflowDescription = "More options";
         final ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = decorView.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -207,7 +207,7 @@ public class MyActionBarActivity extends ActionBarActivity {
                 if (outViews.isEmpty()) {
                     return;
                 }
-                TintImageView overflow=(TintImageView) outViews.get(0);
+                ImageView overflow = (ImageView) outViews.get(0);
                 //overflow.setColorFilter(Color.CYAN);
                 overflow.setImageResource(imageID);
                 removeOnGlobalLayoutListener(decorView, this);

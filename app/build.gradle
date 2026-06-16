@@ -1,40 +1,31 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    namespace "com.catchingnow.clip"
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.catchingnow.clip"
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionName "2.1.9" //jfhuh
+        minSdkVersion 24
+        targetSdkVersion 34
+        versionCode 12
+        versionName "2.2.0"
     }
     signingConfigs {
         baseSignConfigs {
-            //MD5: 71:E5:40:32:69:0D:EB:C0:BE:28:5F:8F:9B:59:09:24
-            //SHA1: F5:E8:CF:7B:83:FD:66:53:D4:5D:9B:D8:47:A7:F2:1A:61:00:26:F0
-            //storeFile file('C:/Users/win7/.android/bpa.keystore')
-            storeFile file("bpa.keystore")        // 签名文件的路径
-            storePassword "bpa.com"               // 密码
-            keyAlias "bpa"                        // 签名的别名
-            keyPassword "bpa.com"                 // 密码
-
-            //v1和v2的签名使用
-            //1）只勾选v1签名并不会影响什么，但是在7.0上不会使用更安全的验证方式
-            //2）只勾选V2签名7.0以下会直接安装完显示未安装，7.0以上则使用了V2的方式验证
-            //3）同时勾选V1和V2则所有机型都没问题
+            storeFile file("bpa.keystore")
+            storePassword "bpa.com"
+            keyAlias "bpa"
+            keyPassword "bpa.com"
             v1SigningEnabled true
             v2SigningEnabled true
         }
     }
     buildTypes {
         release {
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
-            minifyEnabled false                  // 开启代码混淆
-            shrinkResources false                // 移除无用的resource文件
-            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.txt'
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.baseSignConfigs
         }
     }
@@ -42,13 +33,13 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
-
-
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.2'
-    compile 'com.android.support:recyclerview-v7:21.0.2'
-    compile 'com.android.support:cardview-v7:21.0.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.preference:preference:1.2.1'
 }

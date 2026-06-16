@@ -1,5 +1,7 @@
 package com.catchingnow.clip;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -18,9 +20,9 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -45,6 +47,7 @@ public class CBWatcherService extends Service {
     public int NUMBER_OF_CLIPS = 5; //3-6
 
     private final static String NOTIFICATION_GROUP = "notification_group";
+    private static final String CHANNEL_ID = "clipstack_clipboard";
     private Context mContext;
     private NotificationManagerCompat notificationManager;
     private ClipboardManager clipboardManager;
@@ -82,6 +85,16 @@ public class CBWatcherService extends Service {
         } else {
             bindJobScheduler();
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_MIN
+            );
+            channel.setShowBadge(false);
+            notificationManager.createNotificationChannel(channel);
+        }
+        startForegroundIfNeeded();
         super.onCreate();
     }
 
@@ -255,7 +268,7 @@ public class CBWatcherService extends Service {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        NotificationCompat.Builder preBuildNotification = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder preBuildNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.clip_notification_title, MyUtil.stringLengthCut(thisClips.get(0).getText()))) //title
                 .setSmallIcon(R.drawable.ic_stat_icon_colorful)
                 .setVisibility(NotificationCompat.VISIBILITY_SECRET)
@@ -353,7 +366,7 @@ public class CBWatcherService extends Service {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
-        NotificationCompat.Builder preBuildN = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder preBuildN = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentIntent(pOpenMainDialogIntent)
                 .setContentTitle(getString(R.string.clip_notification_title, currentClip))
                 .setOngoing(pinOnTop)
@@ -548,7 +561,7 @@ public class CBWatcherService extends Service {
                     );
 
             for (ClipObject clip : clips) {
-                notifications.add(new NotificationCompat.Builder(mContext)
+                notifications.add(new NotificationCompat.Builder(mContext, CHANNEL_ID)
                         //.setStyle(wearPageStyle)
                         .setContentTitle(
                                 MyUtil.getFormatDate(context, clip.getDate())
@@ -585,5 +598,17 @@ public class CBWatcherService extends Service {
             //expandedView.setTextViewText(R.id.text, "Hello World!");
             return expandedView;
         }
+    }
+
+    private void startForegroundIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        Notification n = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.clip_notification_single_text))
+                .setSmallIcon(R.drawable.ic_stat_icon)
+                .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build();
+        startForeground(1, n);
     }
 }

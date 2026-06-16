@@ -8,7 +8,7 @@ import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -109,24 +109,17 @@ public class ActivityEditor extends MyActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch (id) {
-            case (R.id.action_share):
-                shareText();
-                break;
-            case (R.id.action_star):
-                //Once click will change it. Twice won't change it.
-                isStarred = !isStarred;
-                setStarredIcon();
-                break;
-            case (R.id.action_delete):
-                deleteText();
-                break;
-            case (R.id.action_cancel):
-            case (android.R.id.home):
-                finishAndRemoveTaskWithToast(getString(R.string.toast_no_saved));
-                break;
-            case (R.id.action_save):
-                saveText();
+        if (id == R.id.action_share) {
+            shareText();
+        } else if (id == R.id.action_star) {
+            isStarred = !isStarred;
+            setStarredIcon();
+        } else if (id == R.id.action_delete) {
+            deleteText();
+        } else if (id == R.id.action_cancel || id == android.R.id.home) {
+            finishAndRemoveTaskWithToast(getString(R.string.toast_no_saved));
+        } else if (id == R.id.action_save) {
+            saveText();
         }
         return super.onOptionsItemSelected(item);
     }
