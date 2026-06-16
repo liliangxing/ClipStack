@@ -88,8 +88,17 @@ public class ActivityMain extends MyActionBarActivity {
         try {
             CrashHandler.getInstance().init(this);
             CrashHandler.log("ActivityMain", "onCreate start SDK=" + Build.VERSION.SDK_INT + " isExternalStorageManager=" + Environment.isExternalStorageManager());
-            setContentView(R.layout.activity_main);
             super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
+            mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+            if (mToolbar != null) {
+                setSupportActionBar(mToolbar);
+                if (getString(R.string.screen_type).contains("phone")) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        mToolbar.setElevation(MyUtil.dip2px(this, 4));
+                    }
+                }
+            }
             checkPermission(1);
             CrashHandler.log("ActivityMain", "onCreate end");
         } catch (Throwable e) {

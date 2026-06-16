@@ -283,7 +283,7 @@ public class CBWatcherService extends Service {
                         this,
                         pIntentId--,
                         openMainDialogIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 );
 
         NotificationCompat.Builder preBuildNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -372,7 +372,7 @@ public class CBWatcherService extends Service {
                         this,
                         pIntentId--,
                         openMainDialogIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 );
         Intent openEditorIntent = new Intent(this, ClipObjectActionBridge.class)
                 .putExtra(ClipObjectActionBridge.ACTION_CODE, ClipObjectActionBridge.ACTION_EDIT);
@@ -381,7 +381,7 @@ public class CBWatcherService extends Service {
                         this,
                         pIntentId--,
                         openEditorIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 );
 
         NotificationCompat.Builder preBuildN = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -468,7 +468,7 @@ public class CBWatcherService extends Service {
             PendingIntent pOpenShareIntent = PendingIntent.getService(this.context,
                     buttonNumber++,
                     openShareIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             expandedView.setOnClickPendingIntent(R.id.clip_share_button, pOpenShareIntent);
             //add pIntent for edit
             Intent openEditIntent = new Intent(this.context, ClipObjectActionBridge.class)
@@ -479,7 +479,7 @@ public class CBWatcherService extends Service {
                     this.context,
                     buttonNumber++,
                     openEditIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             expandedView.setOnClickPendingIntent(R.id.current_clip, pOpenEditIntent);
             //add pIntent for star click
             Intent openStarIntent = new Intent(this.context, CBWatcherService.class)
@@ -488,7 +488,7 @@ public class CBWatcherService extends Service {
                     this.context,
                     buttonNumber++,
                     openStarIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             expandedView.setOnClickPendingIntent(R.id.star, pOpenStarIntent);
             //set star's icon
             if (isStarred) {
@@ -518,7 +518,7 @@ public class CBWatcherService extends Service {
                     context,
                     buttonNumber++,
                     openEditIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             theClipView.setOnClickPendingIntent(R.id.clip_text, pOpenEditIntent);
 
             if (clipObject.getText().equals(getString(R.string.clip_notification_single_text))) {
@@ -549,7 +549,7 @@ public class CBWatcherService extends Service {
                 PendingIntent pOpenCopyIntent = PendingIntent.getService(context,
                         buttonNumber++,
                         openCopyIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                 theClipView.setOnClickPendingIntent(R.id.clip_copy_button, pOpenCopyIntent);
             }
 
@@ -566,7 +566,7 @@ public class CBWatcherService extends Service {
                     this.context,
                     buttonNumber++,
                     openStarIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             Intent openMainIntent = new Intent(context, ClipObjectActionBridge.class)
                     .putExtra(ClipObjectActionBridge.ACTION_CODE, ClipObjectActionBridge.ACTION_OPEN_MAIN_DIALOG);
