@@ -16,6 +16,8 @@ public class LaunchServiceAtStartup extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+        CrashHandler.log("LaunchServiceAtStartup", "onReceive action=" + (intent != null ? intent.getAction() : "null"));
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
 //            SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
 //            boolean forceShowNotification = preference.getBoolean(ActivitySetting.PREF_NOTIFICATION_PIN, false);
@@ -35,6 +37,10 @@ public class LaunchServiceAtStartup extends BroadcastReceiver {
                     ) {
                 context.startService(new Intent(context, FloatingWindowService.class));
             }
+        }
+        CrashHandler.log("LaunchServiceAtStartup", "onReceive OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("LaunchServiceAtStartup.onReceive", e);
         }
     }
 }

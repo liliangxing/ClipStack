@@ -15,8 +15,14 @@ public class SyncJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
+        CrashHandler.log("SyncJobService", "onStartJob");
+        try {
         Log.v(MyUtil.PACKAGE_NAME, "Start Clean up...");
         return Storage.getInstance(this).cleanUpAndRequestBackup();
+        } catch (Throwable e) {
+            CrashHandler.logException("SyncJobService.onStartJob", e);
+            return false;
+        }
     }
 
     @Override

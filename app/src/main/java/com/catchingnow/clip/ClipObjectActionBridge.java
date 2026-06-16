@@ -41,6 +41,8 @@ public class ClipObjectActionBridge extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        try {
+        CrashHandler.log("ClipObjectActionBridge", "onHandleIntent");
         Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         sendBroadcast(it);
 
@@ -75,6 +77,9 @@ public class ClipObjectActionBridge extends IntentService {
             case ACTION_CHANGE_WIDGET_STAR:
                 changeWidgetStarredStatus();
                 return;
+        }
+        } catch (Throwable e) {
+            CrashHandler.logException("ClipObjectActionBridge.onHandleIntent", e);
         }
     }
 

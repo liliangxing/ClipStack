@@ -37,28 +37,34 @@ public class ActivityBackup extends MyActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_backup);
-        super.onCreate(savedInstanceState);
-        context = this;
-        activity = this;
-        newBackupView = findViewById(R.id.new_backup);
-        backupView = (LinearLayout) findViewById(R.id.backup_list);
-        Button buttonNewBackup = (Button) newBackupView;
-        buttonNewBackup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions options = ActivityOptions
-                            .makeSceneTransitionAnimation(activity,
-                                    newBackupView,
-                                    getString(R.string.action_export));
-                    startActivity(new Intent(context, ActivityBackupNew.class), options.toBundle());
-                } else {
-                    startActivity(new Intent(context, ActivityBackupNew.class));
+        try {
+            CrashHandler.log("ActivityBackup", "onCreate");
+            setContentView(R.layout.activity_backup);
+            super.onCreate(savedInstanceState);
+            context = this;
+            activity = this;
+            newBackupView = findViewById(R.id.new_backup);
+            backupView = (LinearLayout) findViewById(R.id.backup_list);
+            Button buttonNewBackup = (Button) newBackupView;
+            buttonNewBackup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        ActivityOptions options = ActivityOptions
+                                .makeSceneTransitionAnimation(activity,
+                                        newBackupView,
+                                        getString(R.string.action_export));
+                        startActivity(new Intent(context, ActivityBackupNew.class), options.toBundle());
+                    } else {
+                        startActivity(new Intent(context, ActivityBackupNew.class));
+                    }
                 }
-            }
-        });
-
+            });
+            CrashHandler.log("ActivityBackup", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivityBackup.onCreate", e);
+            throw e;
+        }
     }
 
     @Override
@@ -172,16 +178,12 @@ public class ActivityBackup extends MyActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_backup, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             initImportView(true);

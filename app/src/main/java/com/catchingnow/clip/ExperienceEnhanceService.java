@@ -46,6 +46,8 @@ public class ExperienceEnhanceService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
+        CrashHandler.log("ExperienceEnhanceService", "onServiceConnected");
+        try {
         context = this;
         handler = new Handler();
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -67,11 +69,16 @@ public class ExperienceEnhanceService extends AccessibilityService {
                 restartCBWatcherService,
                 new IntentFilter(CBWatcherService.ON_DESTROY)
         );
+        CrashHandler.log("ExperienceEnhanceService", "onServiceConnected OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ExperienceEnhanceService.onServiceConnected", e);
+        }
         super.onServiceConnected();
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        try {
 
         //Check package name
         AccessibilityNodeInfo nodeInfo = event.getSource();
@@ -94,6 +101,9 @@ public class ExperienceEnhanceService extends AccessibilityService {
                 //Log.i("AccessibilityNodeInfo", "false");
                 stopFloatingWindow();
             }
+        }
+        } catch (Throwable e) {
+            CrashHandler.logException("ExperienceEnhanceService.onAccessibilityEvent", e);
         }
     }
 

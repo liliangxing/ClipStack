@@ -28,9 +28,16 @@ public class ActivityBackupNew extends MyActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
+        CrashHandler.log("ActivityBackupNew", "onCreate");
         setContentView(R.layout.activity_new_backup);
         super.onCreate(savedInstanceState);
         initExportView();
+        CrashHandler.log("ActivityBackupNew", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivityBackupNew.onCreate", e);
+            throw e;
+        }
     }
 
 

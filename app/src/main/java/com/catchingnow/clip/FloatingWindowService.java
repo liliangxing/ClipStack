@@ -96,7 +96,8 @@ public class FloatingWindowService extends Service {
 
     @Override
     public void onCreate() {
-
+        CrashHandler.log("FloatingWindowService", "onCreate");
+        try {
         super.onCreate();
         if (checkPermission()) {
             onStartCommandReturn = START_STICKY;
@@ -190,13 +191,22 @@ public class FloatingWindowService extends Service {
         } catch (Exception e) {
             Log.e(MyUtil.PACKAGE_NAME, e.toString());
         }
+        CrashHandler.log("FloatingWindowService", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("FloatingWindowService.onCreate", e);
+        }
 
     }
 
     @Override
     public void onDestroy() {
+        CrashHandler.log("FloatingWindowService", "onDestroy");
+        try {
         Log.i(MyUtil.PACKAGE_NAME, "onDestroy");
         FWHideAnimate();
+        } catch (Throwable e) {
+            CrashHandler.logException("FloatingWindowService.onDestroy", e);
+        }
         super.onDestroy();
     }
 

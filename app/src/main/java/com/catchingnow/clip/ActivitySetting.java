@@ -118,14 +118,19 @@ public class ActivitySetting extends MyPreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
         super.onCreate(savedInstanceState);
-
+        CrashHandler.log("ActivitySetting", "onCreate");
         context = this.getBaseContext();
         addPreferencesFromResource(R.xml.preference);
         mActionBar.setTitle(getTitle());
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
+        CrashHandler.log("ActivitySetting", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivitySetting.onCreate", e);
+            throw e;
+        }
     }
 
     @Override

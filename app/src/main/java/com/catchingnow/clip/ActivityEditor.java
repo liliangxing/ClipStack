@@ -31,8 +31,10 @@ public class ActivityEditor extends MyActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        try {
         setContentView(R.layout.activity_editor);
         super.onCreate(savedInstanceState);
+        CrashHandler.log("ActivityEditor", "onCreate");
         Intent intent = getIntent();
         oldText = intent.getStringExtra(Intent.EXTRA_TEXT);
         isStarred = intent.getBooleanExtra(ClipObjectActionBridge.STATUE_IS_STARRED, false);
@@ -73,6 +75,11 @@ public class ActivityEditor extends MyActionBarActivity {
                     BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_edit),
                     getResources().getColor(R.color.primary)
             ));
+        }
+        CrashHandler.log("ActivityEditor", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivityEditor.onCreate", e);
+            throw e;
         }
     }
 
