@@ -81,18 +81,38 @@ public class ActivityMain extends MyActionBarActivity {
     private String queryText = "";
 
     private int tooYoungTooSimple = 0;
+    private boolean mInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setContentView(R.layout.activity_main);
-        super.onCreate(savedInstanceState);
-        checkPermission(1);
+        try {
+            CrashHandler.getInstance().init(this);
+            CrashHandler.log("ActivityMain", "onCreate start SDK=" + Build.VERSION.SDK_INT + " isExternalStorageManager=" + Environment.isExternalStorageManager());
+            setContentView(R.layout.activity_main);
+            super.onCreate(savedInstanceState);
+            checkPermission(1);
+            CrashHandler.log("ActivityMain", "onCreate end");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivityMain.onCreate", e);
+            throw e;
+        }
     }
 
     private void initializeCreate(){
-        context = this.getBaseContext();
-        db = Storage.getInstance(context);
+        CrashHandler.log("ActivityMain", "initializeCreate start");
+        try {
+            context = this.getBaseContext();
+            db = Storage.getInstance(context);
+            CrashHandler.log("ActivityMain", "Storage.getInstance OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("ActivityMain.Storage.getInstance", e);
+            Toast.makeText(this, "Database init failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            db = null;
+            return;
+        }
         queryText = "";
+        mInitialized = true;
+        CrashHandler.log("ActivityMain", "initializeCreate OK");
 
         mFAB = (ImageButton) findViewById(R.id.main_fab);
 
@@ -145,6 +165,7 @@ public class ActivityMain extends MyActionBarActivity {
                 new IntentFilter(Storage.UPDATE_DB));
     }
     private void checkPermission(int requestCode) {
+        CrashHandler.log("ActivityMain", "checkPermission SDK=" + Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!android.os.Environment.isExternalStorageManager()) {
                 new AlertDialog.Builder(this)
@@ -239,6 +260,20 @@ public class ActivityMain extends MyActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        CrashHandler.log("ActivityMain", "onResume mInitialized=" + mInitialized);
+
+        if (!mInitialized && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (android.os.Environment.isExternalStorageManager()) {
+                CrashHandler.log("ActivityMain", "onResume storage granted, initializing");
+                initializeCreate();
+            } else {
+                CrashHandler.log("ActivityMain", "onResume storage NOT granted");
+            }
+        }
+        if (!mInitialized) {
+            CrashHandler.log("ActivityMain", "onResume still not initialized, skipping UI");
+            return;
+        }
 
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         clickToCopy = (preference.getString(ActivitySetting.PREF_LONG_CLICK_BEHAVIOR, "0").equals("1"));

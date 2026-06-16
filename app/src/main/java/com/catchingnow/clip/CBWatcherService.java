@@ -71,21 +71,24 @@ public class CBWatcherService extends Service {
 
     @Override
     public void onCreate() {
-        Log.v(MyUtil.PACKAGE_NAME, "onCreate CBService");
-        mContext = this;
-        mHandler = new Handler();
-        preference = PreferenceManager.getDefaultSharedPreferences(this);
-        readPreference();
-        notificationManager = NotificationManagerCompat.from(this);
-        db = Storage.getInstance(this.getBaseContext());
-        clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        clipboardManager.addPrimaryClipChangedListener(listener);
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            Log.w(MyUtil.PACKAGE_NAME, "Not support JobScheduler");
-        } else {
-            bindJobScheduler();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        CrashHandler.log("CBWatcherService", "onCreate start SDK=" + Build.VERSION.SDK_INT);
+        try {
+            Log.v(MyUtil.PACKAGE_NAME, "onCreate CBService");
+            mContext = this;
+            mHandler = new Handler();
+            preference = PreferenceManager.getDefaultSharedPreferences(this);
+            readPreference();
+            notificationManager = NotificationManagerCompat.from(this);
+            db = Storage.getInstance(this.getBaseContext());
+            CrashHandler.log("CBWatcherService", "Storage.getInstance OK");
+            clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            clipboardManager.addPrimaryClipChangedListener(listener);
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                Log.w(MyUtil.PACKAGE_NAME, "Not support JobScheduler");
+            } else {
+                bindJobScheduler();
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     getString(R.string.app_name),
@@ -95,11 +98,17 @@ public class CBWatcherService extends Service {
             notificationManager.createNotificationChannel(channel);
         }
         startForegroundIfNeeded();
+            CrashHandler.log("CBWatcherService", "onCreate OK");
+        } catch (Throwable e) {
+            CrashHandler.logException("CBWatcherService.onCreate", e);
+        }
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        CrashHandler.log("CBWatcherService", "onStartCommand");
+        try {
         boolean beforeTemporaryStop = temporaryStop;
         if (intent == null) {
             intent = new Intent();
@@ -154,6 +163,10 @@ public class CBWatcherService extends Service {
         }
 
         return START_STICKY;
+        } catch (Throwable e) {
+            CrashHandler.logException("CBWatcherService.onStartCommand", e);
+            return START_NOT_STICKY;
+        }
     }
 
     @Override
@@ -163,9 +176,14 @@ public class CBWatcherService extends Service {
 
     @Override
     public void onDestroy() {
-        notificationManager.cancelAll();
-        ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).removePrimaryClipChangedListener(listener);
-        LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(ON_DESTROY));
+        CrashHandler.log("CBWatcherService", "onDestroy");
+        try {
+            notificationManager.cancelAll();
+            ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).removePrimaryClipChangedListener(listener);
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(ON_DESTROY));
+        } catch (Throwable e) {
+            CrashHandler.logException("CBWatcherService.onDestroy", e);
+        }
         super.onDestroy();
     }
 
