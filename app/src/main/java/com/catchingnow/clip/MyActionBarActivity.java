@@ -118,17 +118,14 @@ public class MyActionBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         Toolbar mToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
+        if (mToolbar != null) {
+            setSupportActionBar(mToolbar);
 
-        //set toolbar shadow for phone.
-        if (getString(R.string.screen_type).contains("phone")) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mToolbar.setElevation(MyUtil.dip2px(this, 4));
-//            } else {
-//                View mToolbarShadow = findViewById(R.id.my_toolbar_shadow);
-//                if (mToolbarShadow != null) {
-//                    mToolbarShadow.setVisibility(View.VISIBLE);
-//                }
+            //set toolbar shadow for phone.
+            if (getString(R.string.screen_type).contains("phone")) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mToolbar.setElevation(MyUtil.dip2px(this, 4));
+                }
             }
         }
     }
