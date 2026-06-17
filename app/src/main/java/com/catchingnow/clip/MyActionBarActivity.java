@@ -140,27 +140,31 @@ public class MyActionBarActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i(MyUtil.PACKAGE_NAME, "sendBroadcast ACTIVITY_CLOSED");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTIVITY_CLOSED));
-        CBWatcherService.startCBService(this, -1);
-        if (preference.getBoolean(ActivitySetting.PREF_FLOATING_BUTTON, false) &&
-                preference.getString(ActivitySetting.PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")
-                ) {
-            this.startService(new Intent(this, FloatingWindowService.class));
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTIVITY_OPENED));
-        CBWatcherService.startCBService(this, true, true, 1);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || android.os.Environment.isExternalStorageManager()) {
+            CBWatcherService.startCBService(this, true, true, 1);
+        }
         if (preference.getBoolean(ActivitySetting.PREF_FLOATING_BUTTON, false) &&
                 preference.getString(ActivitySetting.PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")
                 ) {
             this.stopService(new Intent(this, FloatingWindowService.class));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(MyUtil.PACKAGE_NAME, "sendBroadcast ACTIVITY_CLOSED");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTIVITY_CLOSED));
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || android.os.Environment.isExternalStorageManager()) {
+            CBWatcherService.startCBService(this, -1);
+        }
+        if (preference.getBoolean(ActivitySetting.PREF_FLOATING_BUTTON, false) &&
+                preference.getString(ActivitySetting.PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")
+                ) {
+            this.startService(new Intent(this, FloatingWindowService.class));
         }
     }
 
