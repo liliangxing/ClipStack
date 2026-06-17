@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.preference.PreferenceManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -147,9 +149,11 @@ public class MyActionBarActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(ACTIVITY_OPENED));
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || android.os.Environment.isExternalStorageManager()) {
-            CBWatcherService.startCBService(this, true, true, 1);
-        }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || android.os.Environment.isExternalStorageManager()) {
+                CBWatcherService.startCBService(this, true, true, 1);
+            }
+        }, 1500);
         if (preference.getBoolean(ActivitySetting.PREF_FLOATING_BUTTON, false) &&
                 preference.getString(ActivitySetting.PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")
                 ) {
