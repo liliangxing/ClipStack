@@ -178,9 +178,9 @@ public class ActivityMain extends MyActionBarActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!android.os.Environment.isExternalStorageManager()) {
                 new AlertDialog.Builder(this)
-                        .setTitle(R.string.app_name)
-                        .setMessage("ClipStack needs storage access to save clipboard database. Please grant 'All files access' permission.")
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        .setTitle("需要权限")
+                        .setMessage("Android 11+ 需要打开「所有文件访问权限」\n\n请在设置页面打开开关。")
+                        .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
@@ -188,12 +188,13 @@ public class ActivityMain extends MyActionBarActivity {
                                 startActivity(intent);
                             }
                         })
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish();
                             }
                         })
+                        .setCancelable(false)
                         .create()
                         .show();
             } else {
