@@ -61,7 +61,7 @@ public class AppWidget extends AppWidgetProvider {
                 context,
                 0,
                 new Intent(context, ActivityMain.class),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
         views.setOnClickPendingIntent(R.id.widget_title_text, pMainIntent);
 
@@ -71,7 +71,7 @@ public class AppWidget extends AppWidgetProvider {
                 new Intent(context, ClipObjectActionBridge.class)
                         .putExtra(ClipObjectActionBridge.ACTION_CODE,
                                 ClipObjectActionBridge.ACTION_CHANGE_WIDGET_STAR),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
         views.setOnClickPendingIntent(R.id.widget_title_star, pStarIntent);
 
@@ -81,7 +81,7 @@ public class AppWidget extends AppWidgetProvider {
                 new Intent(context, ActivityEditor.class)
                         .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, isStarred)
                         .putExtra(Intent.EXTRA_TEXT, ""),
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
         views.setOnClickPendingIntent(R.id.widget_title_add, pAddIntent);
 
@@ -99,7 +99,7 @@ public class AppWidget extends AppWidgetProvider {
                         context,
                         8,
                         new Intent(context, ClipObjectActionBridge.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                 ));
 
         // Instruct the widget manager to update the widget

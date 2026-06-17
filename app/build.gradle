@@ -8,8 +8,8 @@ android {
         applicationId "com.catchingnow.clip"
         minSdkVersion 24
         targetSdkVersion 34
-        versionCode 18
-        versionName "2.2.6"
+        versionCode 19
+        versionName "2.2.7"
     }
     signingConfigs {
         baseSignConfigs {

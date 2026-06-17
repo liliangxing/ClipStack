@@ -536,7 +536,7 @@ public class CBWatcherService extends Service {
                 PendingIntent pPauseIntent = PendingIntent.getService(context,
                         buttonNumber++,
                         pauseIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                         );
                 theClipView.setOnClickPendingIntent(R.id.clip_copy_button, pPauseIntent);
             } else {
@@ -575,7 +575,7 @@ public class CBWatcherService extends Service {
                             context,
                             pIntentId--,
                             openMainIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
                     );
 
             for (ClipObject clip : clips) {
