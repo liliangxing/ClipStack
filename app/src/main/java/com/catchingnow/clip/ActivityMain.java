@@ -63,7 +63,6 @@ public class ActivityMain extends MyActionBarActivity {
     private Menu menu;
     protected MenuItem starItem;
 
-    protected SharedPreferences preference;
     protected Context context;
     private Storage db;
     private List<ClipObject> clips;
