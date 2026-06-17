@@ -1,16 +1,20 @@
 package com.catchingnow.clip;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.preference.PreferenceManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -164,7 +168,11 @@ public class MyActionBarActivity extends AppCompatActivity {
         if (preference.getBoolean(ActivitySetting.PREF_FLOATING_BUTTON, false) &&
                 preference.getString(ActivitySetting.PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")
                 ) {
-            this.startService(new Intent(this, FloatingWindowService.class));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                Log.w(MyUtil.PACKAGE_NAME, "FloatingWindow: overlay permission not granted");
+            } else {
+                this.startService(new Intent(this, FloatingWindowService.class));
+            }
         }
     }
 

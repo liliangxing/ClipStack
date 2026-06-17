@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.preference.PreferenceManager;
@@ -54,7 +55,9 @@ public class ActivitySetting extends MyPreferenceActivity {
                     case PREF_FLOATING_BUTTON_ALWAYS_SHOW:
                         if (sharedPreferences.getBoolean(PREF_FLOATING_BUTTON, false)) {
                             if (sharedPreferences.getString(PREF_FLOATING_BUTTON_ALWAYS_SHOW, "always").equals("always")) {
-                                context.startService(new Intent(context, FloatingWindowService.class));
+                                if (checkOverlayPermission()) {
+                                    context.startService(new Intent(context, FloatingWindowService.class));
+                                }
                             } else {
                                 checkAccessibilityPermission();
                                 context.stopService(new Intent(context, FloatingWindowService.class));
@@ -110,6 +113,28 @@ public class ActivitySetting extends MyPreferenceActivity {
                             }
                         }
                 )
+                .setCancelable(false)
+                .create()
+                .show();
+        return false;
+    }
+
+    private boolean checkOverlayPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
+        if (Settings.canDrawOverlays(this)) return true;
+        new AlertDialog.Builder(this)
+                .setTitle("需要悬浮窗权限")
+                .setMessage("悬浮球功能需要在其他应用上层显示内容，请在设置页面打开「允许显示在其他应用的上层」。")
+                .setPositiveButton("去设置", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        Uri.parse("package:" + getPackageName()));
+                                startActivityForResult(intent, 0);
+                            }
+                        }
+                )
+                .setNegativeButton(getString(R.string.dialog_cancel), null)
                 .setCancelable(false)
                 .create()
                 .show();
