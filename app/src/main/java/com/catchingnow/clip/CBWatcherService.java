@@ -212,13 +212,21 @@ public class CBWatcherService extends Service {
     private void performClipboardCheck() {
         Log.v(MyUtil.PACKAGE_NAME, "performClipboardCheck");
         if (temporaryStop) return;
-        if (!clipboardManager.hasPrimaryClip()) return;
+        try {
+            if (!clipboardManager.hasPrimaryClip()) return;
+        } catch (SecurityException e) {
+            Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied (background restriction): " + e.getMessage());
+            return;
+        }
         String clipString;
         try {
             //Don't use CharSequence .toString()!
             CharSequence charSequence = clipboardManager.getPrimaryClip().getItemAt(0).getText();
             clipString = String.valueOf(charSequence);
-        } catch (Error ignored) {
+        } catch (SecurityException e) {
+            Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied (background restriction): " + e.getMessage());
+            return;
+        } catch (Exception ignored) {
             return;
         }
         if (clipString.trim().isEmpty()) return;
@@ -352,17 +360,21 @@ public class CBWatcherService extends Service {
     private void showSingleNotification() {
 
         String currentClip = "Clipboard is empty.";
-        ClipboardManager cb = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        if (cb.hasPrimaryClip()) {
-            ClipData cd = cb.getPrimaryClip();
-            if (cd.getDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-                CharSequence thisClip = cd.getItemAt(0).getText();
-                if (thisClip != null) {
-                    if (!thisClip.toString().isEmpty()) {
-                        currentClip = MyUtil.stringLengthCut(thisClip.toString());
+        try {
+            ClipboardManager cb = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (cb.hasPrimaryClip()) {
+                ClipData cd = cb.getPrimaryClip();
+                if (cd.getDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                    CharSequence thisClip = cd.getItemAt(0).getText();
+                    if (thisClip != null) {
+                        if (!thisClip.toString().isEmpty()) {
+                            currentClip = MyUtil.stringLengthCut(thisClip.toString());
+                        }
                     }
                 }
             }
+        } catch (SecurityException e) {
+            Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied in notification: " + e.getMessage());
         }
 
         Intent openMainDialogIntent = new Intent(this, ClipObjectActionBridge.class)
