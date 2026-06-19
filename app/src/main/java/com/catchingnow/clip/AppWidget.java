@@ -107,6 +107,7 @@ public class AppWidget extends AppWidgetProvider {
     }
 
     public static void updateAllAppWidget(Context context) {
+        if (context == null) return;
         int ids[] = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, AppWidget.class));
         for (int id : ids) {
             AppWidget.updateAppWidget(context, AppWidgetManager.getInstance(context), id);

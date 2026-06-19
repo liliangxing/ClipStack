@@ -673,7 +673,9 @@ public class ActivityMain extends MyActionBarActivity {
         preference.edit()
                 .putBoolean(AppWidget.WIDGET_IS_STARRED, isStarred)
                 .apply();
-        AppWidget.updateAllAppWidget(context);
+        if (context != null) {
+            AppWidget.updateAllAppWidget(context);
+        }
     }
 
     private void setItemsVisibility() {
