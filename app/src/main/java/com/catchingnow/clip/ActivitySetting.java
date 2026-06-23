@@ -1,7 +1,6 @@
 package com.catchingnow.clip;
 
 import android.app.AlertDialog;
-import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,15 +8,19 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.preference.PreferenceManager;
 import android.provider.Settings;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityEvent;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
+
+import android.preference.Preference;
+import rikka.shizuku.Shizuku;
 
 public class ActivitySetting extends MyPreferenceActivity {
 
@@ -29,11 +32,58 @@ public class ActivitySetting extends MyPreferenceActivity {
     public final static String PREF_SAVE_DATES = "pref_save_dates";
     public static final String PREF_FLOATING_BUTTON = "pref_floating_button_switch";
     public static final String PREF_FLOATING_BUTTON_ALWAYS_SHOW = "pref_floating_button_always_show";
-    //    public final static String PREF_LAST_ACTIVE_THIS = "pref_last_active_this";
+    public static final String PREF_SHIZUKU = "pref_shizuku";
+    private static final int SHIZUKU_PERMISSION_REQUEST = 0xC51B;
     private Toolbar mActionBar;
     private SharedPreferences.OnSharedPreferenceChangeListener myPrefChangeListener;
     private SharedPreferences preferences;
     private Context context;
+
+    private final Shizuku.OnRequestPermissionResultListener shizukuPermissionListener =
+            new Shizuku.OnRequestPermissionResultListener() {
+                @Override
+                public void onRequestPermissionResult(int requestCode, int grantResult) {
+                    if (requestCode != SHIZUKU_PERMISSION_REQUEST) return;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (grantResult == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                Toast.makeText(context, R.string.shizuku_toast_activated, Toast.LENGTH_SHORT).show();
+                                ShizukuManager.getInstance(context).start();
+                            } else {
+                                Toast.makeText(context, R.string.shizuku_toast_permission_denied, Toast.LENGTH_SHORT).show();
+                            }
+                            updateShizukuSummary();
+                        }
+                    });
+                }
+            };
+
+    private final Shizuku.OnBinderReceivedListener shizukuBinderReceivedListener =
+            new Shizuku.OnBinderReceivedListener() {
+                @Override
+                public void onBinderReceived() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateShizukuSummary();
+                        }
+                    });
+                }
+            };
+
+    private final Shizuku.OnBinderDeadListener shizukuBinderDeadListener =
+            new Shizuku.OnBinderDeadListener() {
+                @Override
+                public void onBinderDead() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateShizukuSummary();
+                        }
+                    });
+                }
+            };
 
     public ActivitySetting() {
         myPrefChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -152,6 +202,18 @@ public class ActivitySetting extends MyPreferenceActivity {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         CrashHandler.log("ActivitySetting", "onCreate OK");
+
+        // Set up Shizuku preference click handler
+        Preference shizukuPref = findPreference(PREF_SHIZUKU);
+        if (shizukuPref != null) {
+            shizukuPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    showShizukuDialog();
+                    return true;
+                }
+            });
+        }
         } catch (Throwable e) {
             CrashHandler.logException("ActivitySetting.onCreate", e);
             throw e;
@@ -178,12 +240,27 @@ public class ActivitySetting extends MyPreferenceActivity {
         }
 
         initSharedPrefListener();
+
+        // Register Shizuku listeners to keep the preference summary up to date
+        try {
+            Shizuku.addBinderReceivedListenerSticky(shizukuBinderReceivedListener);
+            Shizuku.addBinderDeadListener(shizukuBinderDeadListener);
+            Shizuku.addRequestPermissionResultListener(shizukuPermissionListener);
+        } catch (Throwable t) {
+            Log.w(MyUtil.PACKAGE_NAME, "Shizuku listeners registration failed: " + t.getMessage());
+        }
+        updateShizukuSummary();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
+        try {
+            Shizuku.removeBinderReceivedListener(shizukuBinderReceivedListener);
+            Shizuku.removeBinderDeadListener(shizukuBinderDeadListener);
+            Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener);
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -203,6 +280,101 @@ public class ActivitySetting extends MyPreferenceActivity {
         LayoutInflater.from(this).inflate(layoutResID, contentWrapper, true);
 
         getWindow().setContentView(contentView);
+    }
+
+    /**
+     * Updates the Shizuku preference summary to reflect the current state:
+     * not installed, not running, no permission, or active.
+     */
+    private void updateShizukuSummary() {
+        Preference shizukuPref = findPreference(PREF_SHIZUKU);
+        if (shizukuPref == null) return;
+
+        int summaryRes;
+        if (!ShizukuManager.isShizukuInstalled(context)) {
+            summaryRes = R.string.pref_shizuku_summary_not_installed;
+        } else if (!ShizukuManager.isShizukuRunning()) {
+            summaryRes = R.string.pref_shizuku_summary_not_running;
+        } else if (ShizukuManager.checkSelfPermission() != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            summaryRes = R.string.pref_shizuku_summary_no_permission;
+        } else if (ShizukuManager.getInstance(context).isActive()) {
+            summaryRes = R.string.pref_shizuku_summary_active;
+        } else {
+            summaryRes = R.string.pref_shizuku_summary_no_permission;
+        }
+        shizukuPref.setSummary(summaryRes);
+    }
+
+    /**
+     * Shows a dialog explaining Shizuku integration and guides the user
+     * through the setup: install Shizuku, start the server, authorize.
+     */
+    private void showShizukuDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.shizuku_dialog_title);
+        builder.setMessage(R.string.shizuku_dialog_summary);
+
+        boolean installed = ShizukuManager.isShizukuInstalled(context);
+        boolean running = ShizukuManager.isShizukuRunning();
+        boolean granted = ShizukuManager.checkSelfPermission() == android.content.pm.PackageManager.PERMISSION_GRANTED;
+
+        if (!installed) {
+            builder.setPositiveButton(R.string.shizuku_dialog_install, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://shizuku.rikka.app/")));
+                    } catch (Throwable t) {
+                        CrashHandler.logException("ShizukuDialog.install", t);
+                    }
+                }
+            });
+        } else if (!running) {
+            builder.setPositiveButton(R.string.shizuku_dialog_open, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
+                        if (launchIntent != null) {
+                            startActivity(launchIntent);
+                        }
+                    } catch (Throwable t) {
+                        CrashHandler.logException("ShizukuDialog.open", t);
+                    }
+                }
+            });
+        } else if (!granted) {
+            builder.setPositiveButton(R.string.shizuku_dialog_authorize, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Shizuku.requestPermission(SHIZUKU_PERMISSION_REQUEST);
+                    } catch (Throwable t) {
+                        Toast.makeText(context, R.string.shizuku_toast_not_running, Toast.LENGTH_SHORT).show();
+                        CrashHandler.logException("ShizukuDialog.authorize", t);
+                    }
+                }
+            });
+        } else {
+            // Already authorized and running; just open Shizuku for management
+            builder.setPositiveButton(R.string.shizuku_dialog_open, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        Intent launchIntent = getPackageManager().getLaunchIntentForPackage("moe.shizuku.privileged.api");
+                        if (launchIntent != null) {
+                            startActivity(launchIntent);
+                        }
+                    } catch (Throwable t) {
+                        CrashHandler.logException("ShizukuDialog.open", t);
+                    }
+                }
+            });
+        }
+
+        builder.setNegativeButton(R.string.shizuku_dialog_dismiss, null);
+        builder.show();
     }
 
 }

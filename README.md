@@ -1,21 +1,12 @@
 # Clip-Stack
 
-###Deprecated
-
-This project is deprecated because of personal reason. 
-
-这个项目由于一些私人原因已经停止更新。
-
 ### A tiny clipboard history manager app.
 
+> **v2.5.0 — Shizuku Integration for Android 10+ / Android 16**
+>
+> Starting from Android 10 and made significantly stricter in Android 16, background apps can no longer read the system clipboard. Clip Stack now integrates [Shizuku](https://github.com/RikkaApps/Shizuku) to restore reliable background clipboard monitoring. When Shizuku is running and authorized, Clip Stack runs a small helper service with shell (UID 2000) privileges that is exempt from the background clipboard-read restriction.
+
 ![screenshot](http://ww4.sinaimg.cn/large/66cab368gw1ep3ki6o4yzj21eq0h67am.jpg)
-
-[![Get it on Google Play Store](https://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=com.catchingnow.tinyclipboardmanager)
-
-Other Market:
-
-[F-Droid](https://f-droid.org/repository/browse/?fdid=com.catchingnow.tinyclipboardmanager)
-[CoolAPK](http://coolapk.com/apk/com.catchingnow.tinyclipboardmanager)
 
 #### Unlimited Clips
 
@@ -41,20 +32,31 @@ Other Market:
 
 📌 Using Android 🍭Lollipop's new JobScheduler API, Clip Stack can automatic clean up it's catches and RAM when phone is charging. 
 
+#### Shizuku Integration (Android 10+ / Android 16)
+
+📌 On Android 10+ and especially Android 16, apps cannot read the clipboard in the background. Clip Stack integrates Shizuku to restore this capability:
+
+1. Install the [Shizuku app](https://shizuku.rikka.app/)
+2. Start the Shizuku server (via Wireless Debugging or ADB)
+3. Open Clip Stack → Settings → Enhanced Clipboard Monitoring → Authorize
+
+Once authorized, Clip Stack monitors the clipboard reliably even when in the background.
+
 #### Other Features
 
 ✓ Gratis
 ✓ Free/Libre and Open-Source
 ✓ No-Ads
 
-- Support Android 4.0 above and work better with Android 🍭Lollipop. 👍
+- Support Android 4.4 (API 24) above. Shizuku integration requires Android 10+.
 
 #### Permission Usage
 
 RECEIVE_BOOT_COMPLETED:  Start a background service to listen the system clipboard. It only cost 4.5M - 6M RAM. You can close it in Settings if you really don't want it.
 
-
 WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE:  For export clipboard history. This app won't write any other files to your SD card.
+
+rikka.shizuku.permission.permission.API_V23: Allows Clip Stack to communicate with the Shizuku server for enhanced clipboard monitoring on Android 10+.
 
 -----
 

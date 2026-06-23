@@ -64,6 +64,16 @@
             android:defaultValue="false"
             android:dependency="pref_notification_show" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:dependency="pref_start_service"
+        android:title="@string/pref_shizuku_category">
+        <Preference
+            android:title="@string/pref_shizuku_title"
+            android:summary="@string/pref_shizuku_summary"
+            android:key="pref_shizuku" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/pref_about_category">
         <Preference
             android:title="@string/pref_about_title"

@@ -8,8 +8,8 @@ android {
         applicationId "com.catchingnow.clip"
         minSdkVersion 24
         targetSdkVersion 34
-        versionCode 27
-        versionName "2.4.1"
+        versionCode 28
+        versionName "2.5.0"
     }
     signingConfigs {
         baseSignConfigs {
@@ -33,6 +33,9 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
+    buildFeatures {
+        aidl true
+    }
 }
 
 dependencies {
@@ -42,4 +45,11 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
     implementation 'androidx.preference:preference:1.2.1'
+    // Shizuku SDK - enables system-level clipboard monitoring on Android 10+
+    // The app acts as a Shizuku client; when Shizuku is running, the clipboard
+    // service runs with shell (UID 2000) privileges and can read the clipboard
+    // in the background even on Android 16 where background clipboard access
+    // for normal apps is blocked.
+    implementation 'dev.rikka.shizuku:api:13.1.5'
+    implementation 'dev.rikka.shizuku:provider:13.1.5'
 }

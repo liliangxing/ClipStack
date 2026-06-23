@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Shizuku permission: allows the app to talk to the Shizuku server process -->
+    <uses-permission android:name="rikka.shizuku.permission.permission.API_V23" />
 
     <application
         android:allowBackup="true"
@@ -20,6 +22,15 @@
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAImD2xzM1mjVqrMOV7G1_ccLkNvpmbu8KPJ5XeJg" />
+
+        <!-- Shizuku provider: required by the Shizuku SDK to communicate with the Shizuku server -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <service
             android:name=".CBWatcherService"

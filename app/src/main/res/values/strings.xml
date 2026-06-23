@@ -109,4 +109,22 @@
     <string name="accessibility_dialog_summary">This feature require accessibility permission. \nPlease enable it on Android settings.</string>
     <string name="accessibility_dialog_ok">Open Settings</string>
 
+    <!-- Shizuku integration -->
+    <string name="pref_shizuku_category">Enhanced Clipboard Monitoring</string>
+    <string name="pref_shizuku_title">Shizuku Integration</string>
+    <string name="pref_shizuku_summary">Enable reliable background clipboard monitoring on Android 10+ / Android 16 via Shizuku.</string>
+    <string name="pref_shizuku_summary_active">Active — clipboard is being monitored via Shizuku (shell privileges).</string>
+    <string name="pref_shizuku_summary_not_installed">Shizuku app is not installed. Tap to install.</string>
+    <string name="pref_shizuku_summary_not_running">Shizuku server is not running. Tap to open Shizuku and start it.</string>
+    <string name="pref_shizuku_summary_no_permission">Permission not granted. Tap to authorize.</string>
+    <string name="shizuku_dialog_title">Shizuku Integration</string>
+    <string name="shizuku_dialog_summary">Since Android 10 (and especially Android 16), apps can no longer read the clipboard in the background.\n\nShizuku allows Clip Stack to run a small helper service with shell privileges, restoring reliable background clipboard monitoring.\n\nYou will need:\n• The Shizuku app installed\n• Shizuku server started (via Wireless Debugging or ADB)\n• One-time authorization for Clip Stack</string>
+    <string name="shizuku_dialog_install">Install Shizuku</string>
+    <string name="shizuku_dialog_open">Open Shizuku</string>
+    <string name="shizuku_dialog_authorize">Authorize</string>
+    <string name="shizuku_dialog_dismiss">Later</string>
+    <string name="shizuku_toast_activated">Clipboard monitoring via Shizuku is now active.</string>
+    <string name="shizuku_toast_permission_denied">Shizuku permission was denied.</string>
+    <string name="shizuku_toast_not_running">Shizuku server is not running. Please start it first.</string>
+
 </resources>

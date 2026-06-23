@@ -109,4 +109,22 @@
     <string name="toast_service_temporary_resume">记录已恢复。</string>
     <string name="accessibility_service_description">开启以获得更多功能：\n\n• 当设备内存不足时，剪纸堆不会被系统关闭。\n• 获得「仅在输入文字时显示浮动按钮」的功能（仅支持 Android 5.0 及以上，暂不支持浏览器）。\n• 更多功能（如黑名单）会在后续版本中添加。</string>
 
+    <!-- Shizuku 集成 -->
+    <string name="pref_shizuku_category">增强剪贴板监听</string>
+    <string name="pref_shizuku_title">Shizuku 集成</string>
+    <string name="pref_shizuku_summary">通过 Shizuku 在 Android 10+ / Android 16 上实现稳定的后台剪贴板监听。</string>
+    <string name="pref_shizuku_summary_active">已激活 — 正在通过 Shizuku（Shell 权限）监听剪贴板。</string>
+    <string name="pref_shizuku_summary_not_installed">未安装 Shizuku 应用，点击安装。</string>
+    <string name="pref_shizuku_summary_not_running">Shizuku 服务未运行，点击打开 Shizuku 并启动。</string>
+    <string name="pref_shizuku_summary_no_permission">未授权，点击授权。</string>
+    <string name="shizuku_dialog_title">Shizuku 集成</string>
+    <string name="shizuku_dialog_summary">从 Android 10 开始（尤其是 Android 16），应用已无法在后台读取剪贴板。\n\nShizuku 允许剪纸堆以 Shell 权限运行一个小型辅助服务，从而恢复稳定的后台剪贴板监听。\n\n你需要：\n• 安装 Shizuku 应用\n• 启动 Shizuku 服务（通过无线调试或 ADB）\n• 一次性授权剪纸堆</string>
+    <string name="shizuku_dialog_install">安装 Shizuku</string>
+    <string name="shizuku_dialog_open">打开 Shizuku</string>
+    <string name="shizuku_dialog_authorize">授权</string>
+    <string name="shizuku_dialog_dismiss">以后再说</string>
+    <string name="shizuku_toast_activated">已通过 Shizuku 激活剪贴板监听。</string>
+    <string name="shizuku_toast_permission_denied">Shizuku 授权被拒绝。</string>
+    <string name="shizuku_toast_not_running">Shizuku 服务未运行，请先启动。</string>
+
 </resources>

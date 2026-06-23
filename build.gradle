@@ -4,9 +4,10 @@ buildscript {
     repositories {
         maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         google()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.0'
+        classpath 'com.android.tools.build:gradle:8.2.2'
     }
 }
 
@@ -14,5 +15,6 @@ allprojects {
     repositories {
         maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         google()
+        mavenCentral()
     }
 }

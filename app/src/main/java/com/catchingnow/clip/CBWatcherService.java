@@ -63,6 +63,7 @@ public class CBWatcherService extends Service {
     private int notificationPriority = 0;
     private int isMyActivitiesOnForeground = 0;
     private int pIntentId = 999;
+    private ShizukuManager shizukuManager;
     private OnPrimaryClipChangedListener listener = new OnPrimaryClipChangedListener() {
         public void onPrimaryClipChanged() {
             performClipboardCheck();
@@ -83,6 +84,13 @@ public class CBWatcherService extends Service {
             CrashHandler.log("CBWatcherService", "Storage.getInstance OK");
             clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             clipboardManager.addPrimaryClipChangedListener(listener);
+            // Initialise Shizuku integration for reliable background clipboard
+            // monitoring on Android 10+ / Android 16. When Shizuku is running
+            // and permission is granted, clipboard events arrive via the
+            // Shizuku process (shell UID) which is exempt from the background
+            // clipboard-read restriction. The legacy listener above remains as
+            // a fallback for older Android versions and when Shizuku is absent.
+            initShizuku();
             if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 Log.w(MyUtil.PACKAGE_NAME, "Not support JobScheduler");
             } else {
@@ -180,6 +188,9 @@ public class CBWatcherService extends Service {
         try {
             notificationManager.cancelAll();
             ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).removePrimaryClipChangedListener(listener);
+            if (shizukuManager != null) {
+                shizukuManager.stop();
+            }
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(ON_DESTROY));
         } catch (Throwable e) {
             CrashHandler.logException("CBWatcherService.onDestroy", e);
@@ -211,31 +222,104 @@ public class CBWatcherService extends Service {
 
     private void performClipboardCheck() {
         Log.v(MyUtil.PACKAGE_NAME, "performClipboardCheck");
-        if (temporaryStop) return;
-        try {
-            if (!clipboardManager.hasPrimaryClip()) return;
-        } catch (SecurityException e) {
-            Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied (background restriction): " + e.getMessage());
+        // If Shizuku is actively monitoring, prefer its clipboard reading
+        // (which works in background on Android 16). Only fall back to the
+        // local ClipboardManager when Shizuku is not connected.
+        if (shizukuManager != null && shizukuManager.isActive()) {
+            String text = shizukuManager.getCurrentClip();
+            if (text != null) {
+                processClipText(text);
+            }
             return;
         }
-        String clipString;
+        // Legacy path: read directly from the system ClipboardManager.
+        // On Android 10+ this will throw SecurityException when the app is
+        // in the background; on Android 16 it is blocked entirely.
+        String clipString = readClipboardFromSystem();
+        if (clipString != null) {
+            processClipText(clipString);
+        }
+    }
+
+    /**
+     * Reads the current clipboard text from the system ClipboardManager.
+     * Returns null if the clipboard is empty, non-text, or access is denied.
+     */
+    private String readClipboardFromSystem() {
+        if (temporaryStop) return null;
+        try {
+            if (!clipboardManager.hasPrimaryClip()) return null;
+        } catch (SecurityException e) {
+            Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied (background restriction): " + e.getMessage());
+            return null;
+        }
         try {
             //Don't use CharSequence .toString()!
             CharSequence charSequence = clipboardManager.getPrimaryClip().getItemAt(0).getText();
-            clipString = String.valueOf(charSequence);
+            return String.valueOf(charSequence);
         } catch (SecurityException e) {
             Log.w(MyUtil.PACKAGE_NAME, "Clipboard access denied (background restriction): " + e.getMessage());
-            return;
+            return null;
         } catch (Exception ignored) {
-            return;
+            return null;
         }
+    }
+
+    /**
+     * Processes a clipboard text string: validates it, deduplicates against
+     * the most recent stored clip, and persists it to the database. This is
+     * the shared sink for both the legacy ClipboardManager listener and the
+     * Shizuku callback path.
+     */
+    private void processClipText(String clipString) {
+        if (clipString == null) return;
+        if (temporaryStop) return;
         if (clipString.trim().isEmpty()) return;
         if (clipString.equals("null")) return;
-        if (db.getClipHistory().size() > 0) {
-            if (clipString.equals(db.getClipHistory().get(0).getText())) return;
+        try {
+            if (db.getClipHistory().size() > 0) {
+                if (clipString.equals(db.getClipHistory().get(0).getText())) return;
+            }
+            int isImportant = db.isClipObjectStarred(clipString) ? 1 : 0;
+            db.modifyClip(null, clipString, isImportant);
+        } catch (Throwable t) {
+            CrashHandler.logException("CBWatcherService.processClipText", t);
         }
-        int isImportant = db.isClipObjectStarred(clipString) ? 1 : 0;
-        db.modifyClip(null, clipString, isImportant);
+    }
+
+    /**
+     * Initialises the Shizuku integration. Registers a clipboard-change
+     * listener that forwards events from the Shizuku process (shell UID)
+     * to {@link #processClipText(String)}.
+     */
+    private void initShizuku() {
+        try {
+            shizukuManager = ShizukuManager.getInstance(this);
+            shizukuManager.setClipboardListener(new ShizukuManager.ClipboardChangeListener() {
+                @Override
+                public void onClipboardChanged(final String text) {
+                    // The callback arrives on a binder thread; hop to the
+                    // main thread for database access and notification updates.
+                    if (mHandler != null) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.i(MyUtil.PACKAGE_NAME, "Shizuku clipboard event: " +
+                                        (text != null ? text.length() : 0) + " chars");
+                                processClipText(text);
+                                showNotification();
+                            }
+                        });
+                    }
+                }
+            });
+            shizukuManager.start();
+            CrashHandler.log("CBWatcherService", "Shizuku integration initialised");
+        } catch (Throwable t) {
+            CrashHandler.logException("CBWatcherService.initShizuku", t);
+            // Shizuku not available; the legacy listener will handle clipboard
+            // monitoring for foreground usage.
+        }
     }
 
     private boolean checkNotificationPermission() {
