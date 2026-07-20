@@ -895,11 +895,21 @@ public class ActivityMain extends MyActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
-                        .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
-                        .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
-                        .putExtra(ClipObjectActionBridge.ACTION_CODE, actionCode);
-                context.startService(openIntent);
+                // For ACTION_EDIT, launch ActivityEditor directly to avoid issues
+                // with starting activities from background services on Android 12+
+                if (actionCode == ClipObjectActionBridge.ACTION_EDIT) {
+                    Intent editIntent = new Intent(context, ActivityEditor.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
+                            .putExtra(Intent.EXTRA_TEXT, clipObject.getText());
+                    context.startActivity(editIntent);
+                } else {
+                    Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
+                            .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
+                            .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
+                            .putExtra(ClipObjectActionBridge.ACTION_CODE, actionCode);
+                    context.startService(openIntent);
+                }
             }
         });
     }
@@ -909,11 +919,21 @@ public class ActivityMain extends MyActionBarActivity {
             @Override
             public boolean onLongClick(View v) {
                 v.playSoundEffect(0);
-                Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
-                        .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
-                        .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
-                        .putExtra(ClipObjectActionBridge.ACTION_CODE, actionCode);
-                context.startService(openIntent);
+                // For ACTION_EDIT, launch ActivityEditor directly to avoid issues
+                // with starting activities from background services on Android 12+
+                if (actionCode == ClipObjectActionBridge.ACTION_EDIT) {
+                    Intent editIntent = new Intent(context, ActivityEditor.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
+                            .putExtra(Intent.EXTRA_TEXT, clipObject.getText());
+                    context.startActivity(editIntent);
+                } else {
+                    Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
+                            .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
+                            .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
+                            .putExtra(ClipObjectActionBridge.ACTION_CODE, actionCode);
+                    context.startService(openIntent);
+                }
 //                if (isFromNotification) {
 //                    moveTaskToBack(true);
 //                }
