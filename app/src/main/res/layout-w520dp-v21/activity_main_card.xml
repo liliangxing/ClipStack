@@ -91,7 +91,7 @@
                     android:text="hello, this is a text test aaaaaaaadac \n dawdasddddsadwaf fefwada wddwdafa awd"
                     android:textSize="16sp"
                     android:textColor="@color/secondary_text_default_material_light"
-                    android:layout_height="match_parent"
+                    android:layout_height="50sp"
                     android:layout_width="match_parent" />
             </LinearLayout>
 
@@ -147,4 +147,3 @@
         android:background="@color/divider" />
 
 </RelativeLayout>
-
