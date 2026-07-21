@@ -6,7 +6,7 @@
     <FrameLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
-        android:layout_height="80dp">
+        android:layout_height="80sp">
 
     <LinearLayout
         android:id="@+id/main_background_view"
@@ -21,9 +21,9 @@
             android:text="@string/toast_deleted"
             android:textSize="20sp"
             android:gravity="center_vertical|left"
-            android:paddingLeft="40dp"
+            android:paddingLeft="40sp"
             android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="match_parent" />
 
         <ImageView
@@ -31,7 +31,7 @@
             android:contentDescription="@string/toast_undo"
             android:scaleX="1.4"
             android:scaleY="1.4"
-            android:padding="12dp"
+            android:padding="12sp"
             android:gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
@@ -50,10 +50,10 @@
 
 
         <RelativeLayout
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="5sp"
+            android:layout_marginLeft="16sp"
+            android:layout_marginRight="16sp"
             android:layout_weight="10"
             android:layout_width="0dp"
             android:layout_height="wrap_content">
@@ -61,7 +61,7 @@
             <TextView
                 android:id="@+id/activity_main_card_date"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
+                android:layout_height="20sp"
                 android:text="Sun Jan 22"
                 android:textColor="@color/accent"
                 android:gravity="center_vertical"
@@ -72,7 +72,7 @@
                 android:layout_below="@id/activity_main_card_date"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:layout_height="50sp">
 
                 <ImageButton
                     android:id="@+id/activity_main_card_star_button"
@@ -80,9 +80,9 @@
                     android:src="@drawable/ic_action_star_outline_grey600"
                     android:background="?android:attr/selectableItemBackground"
                     android:layout_gravity="center"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:padding="4dp"
+                    android:layout_width="42sp"
+                    android:layout_height="42sp"
+                    android:padding="4sp"
                     android:scaleType="fitCenter" />
 
                 <TextView
@@ -95,7 +95,7 @@
                     android:text="hello, this is a text test aaaaaaaadac \n dawdasddddsadwaf fefwada wddwdafa awd"
                     android:textSize="16sp"
                     android:textColor="@color/secondary_text_default_material_light"
-                    android:layout_height="50dp"
+                    android:layout_height="50sp"
                     android:layout_width="match_parent" />
             </LinearLayout>
 
@@ -103,14 +103,14 @@
 
         <RelativeLayout
             android:layout_gravity="top"
-            android:layout_margin="6dp"
+            android:layout_margin="6sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/activity_main_card_time"
                 android:layout_width="wrap_content"
-                android:layout_height="20dp"
+                android:layout_height="20sp"
                 android:text="13:23"
                 android:textColor="@color/accent"
                 android:textSize="12sp" />
@@ -118,13 +118,13 @@
             <ImageButton
                 android:id="@+id/activity_main_card_share_button"
                 android:background="?android:attr/selectableItemBackground"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="2sp"
                 android:src="@drawable/ic_notification_action_share"
                 android:layout_below="@id/activity_main_card_time"
                 android:layout_gravity="center"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
-                android:padding="8dp"
+                android:layout_width="38sp"
+                android:layout_height="38sp"
+                android:padding="8sp"
                 android:scaleType="fitCenter"
                 android:contentDescription="@string/clip_notification_share_button" />
         </RelativeLayout>
