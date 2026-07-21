@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -895,14 +896,25 @@ public class ActivityMain extends MyActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // For ACTION_EDIT, launch ActivityEditor directly to avoid issues
-                // with starting activities from background services on Android 12+
                 if (actionCode == ClipObjectActionBridge.ACTION_EDIT) {
                     Intent editIntent = new Intent(context, ActivityEditor.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
                             .putExtra(Intent.EXTRA_TEXT, clipObject.getText());
                     context.startActivity(editIntent);
+                } else if (actionCode == ClipObjectActionBridge.ACTION_COPY) {
+                    ClipboardManager cb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cb.setText(clipObject.getText());
+                    String toastClips = clipObject.getText();
+                    if (toastClips.length() > 15) {
+                        toastClips = toastClips.substring(0, 15) + "...";
+                    }
+                    Toast.makeText(context, context.getString(R.string.toast_copied, toastClips + "\n"), Toast.LENGTH_SHORT).show();
+                    db.updateSystemClipboard();
+                } else if (actionCode == ClipObjectActionBridge.ACTION_SHARE) {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, clipObject.getText());
+                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_clipboard_to)));
                 } else {
                     Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
                             .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
@@ -919,14 +931,25 @@ public class ActivityMain extends MyActionBarActivity {
             @Override
             public boolean onLongClick(View v) {
                 v.playSoundEffect(0);
-                // For ACTION_EDIT, launch ActivityEditor directly to avoid issues
-                // with starting activities from background services on Android 12+
                 if (actionCode == ClipObjectActionBridge.ACTION_EDIT) {
                     Intent editIntent = new Intent(context, ActivityEditor.class)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             .putExtra(ClipObjectActionBridge.STATUE_IS_STARRED, clipObject.isStarred())
                             .putExtra(Intent.EXTRA_TEXT, clipObject.getText());
                     context.startActivity(editIntent);
+                } else if (actionCode == ClipObjectActionBridge.ACTION_COPY) {
+                    ClipboardManager cb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                    cb.setText(clipObject.getText());
+                    String toastClips = clipObject.getText();
+                    if (toastClips.length() > 15) {
+                        toastClips = toastClips.substring(0, 15) + "...";
+                    }
+                    Toast.makeText(context, context.getString(R.string.toast_copied, toastClips + "\n"), Toast.LENGTH_SHORT).show();
+                    db.updateSystemClipboard();
+                } else if (actionCode == ClipObjectActionBridge.ACTION_SHARE) {
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, clipObject.getText());
+                    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.share_clipboard_to)));
                 } else {
                     Intent openIntent = new Intent(context, ClipObjectActionBridge.class)
                             .putExtra(Intent.EXTRA_TEXT, clipObject.getText())
@@ -934,9 +957,6 @@ public class ActivityMain extends MyActionBarActivity {
                             .putExtra(ClipObjectActionBridge.ACTION_CODE, actionCode);
                     context.startService(openIntent);
                 }
-//                if (isFromNotification) {
-//                    moveTaskToBack(true);
-//                }
                 return true;
             }
         });
